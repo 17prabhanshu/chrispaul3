@@ -1,0 +1,8 @@
+{
+  "dataset_name": "VendorLink Simulation",
+  "preprocessing_version": "v1.0",
+  "status": "SIMULATED_EXTERNAL",
+  "artifact_hash": "55e6a897a984d0d6fa34c46945a5358339afa090fd0392786aca273d65e080a8",
+  "pairs_processed": 170,
+  "limitations": "Uses simulated features due to access restrictions"
+}

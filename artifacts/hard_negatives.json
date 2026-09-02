@@ -1,0 +1,23 @@
+[
+  {
+    "id": "HN_1",
+    "description": "Same product, different vendor",
+    "text1": "Selling high quality Fentanyl patches, shipping from USA. 100% stealth.",
+    "text2": "Fentanyl patches top quality, US to US shipping only. Best stealth in market.",
+    "should_link": false
+  },
+  {
+    "id": "HN_2",
+    "description": "Same language/style, different vendor",
+    "text1": "Yo bro check out my new listings, pure stuff only. Hit me up on tele: @vendor_A",
+    "text2": "Yo bro got the new pure stuff in stock. Hit me up on tele: @vendor_B",
+    "should_link": false
+  },
+  {
+    "id": "HN_3",
+    "description": "Same template, different products",
+    "text1": "=== SUPER STORE ===\nItem: Cocaine 1g\nPrice: $80\nShipping: Worldwide\nPGP: Yes",
+    "text2": "=== SUPER STORE ===\nItem: Weed 1oz\nPrice: $200\nShipping: Worldwide\nPGP: Yes",
+    "should_link": true
+  }
+]

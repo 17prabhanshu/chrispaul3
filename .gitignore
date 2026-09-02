@@ -1,0 +1,41 @@
+# Internal / Sensitive Documents
+/AUDIT/
+/audit/
+/EVALUATION/
+/research/
+**/*.md
+!README.md
+!frontend/README.md
+!backend/README.md
+
+# Virtual Environments & Python
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+
+# Node & Frontend
+node_modules/
+.next/
+out/
+build/
+dist/
+.npm/
+
+# Databases, Storage, & Logs
+*.db
+*.sqlite
+*.sqlite3
+*-shm
+*-wal
+*.log
+backend/artifacts/indexes/
+artifacts/indexes/
+data/raw_external/
+
+# OS Files
+.DS_Store
+Thumbs.db

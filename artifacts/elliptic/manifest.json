@@ -1,0 +1,9 @@
+{
+  "dataset_name": "Elliptic++",
+  "preprocessing_version": "v2.0",
+  "status": "SIMULATED_EXTERNAL",
+  "artifact_hash": "fc241c6ad8edfdf4e34dff5103f52cf52a891615ba4d9889b5f02f5253b01d91",
+  "nodes_processed": 500,
+  "data_access_method": "Git LFS clone required",
+  "limitations": "Data is in Git LFS; raw.githubusercontent.com returns pointer files, not CSVs"
+}
