@@ -8,6 +8,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 export default function Dashboard() {
   const [health, setHealth] = useState<any>(null);
+  const [ailStream, setAilStream] = useState<any[]>([]);
+
   const [entities, setEntities] = useState<any[]>([]);
   const [alerts, setAlerts] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
@@ -121,6 +123,8 @@ export default function Dashboard() {
       const payload = endpoint.includes('agora') ? { limit: 2 } : undefined;
       const res = await axios.post(`http://localhost:8000/api${endpoint}`, payload);
       setPipelineStatus(`${successMsg} | Status: Success`);
+      if (res.data.stream) setAilStream(res.data.stream);
+
       
       // Force refresh data after pipeline finishes
       const ent = await axios.get("http://localhost:8000/api/entities");
@@ -221,6 +225,24 @@ export default function Dashboard() {
           <div className="mt-4 flex items-center gap-2 text-xs font-mono bg-cyan-950/30 p-3 rounded-lg text-cyan-300 border border-cyan-900/50 shadow-[inset_0_0_10px_rgba(6,182,212,0.1)] relative z-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <CheckCircle size={14} className="text-cyan-400" />
             <span className="glitch-text">{pipelineStatus}</span>
+          </div>
+        )}
+
+        {ailStream.length > 0 && (
+          <div className="mt-6 bg-black border border-green-500/30 rounded-lg p-4 font-mono text-[10px] overflow-hidden shadow-[0_0_15px_rgba(34,197,94,0.1)] relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent opacity-50"></div>
+            <div className="flex items-center gap-2 mb-3 text-green-400 border-b border-green-900/50 pb-2">
+              <Activity size={14} className="animate-pulse" />
+              <span className="tracking-widest uppercase">AIL Framework // Live Leak Stream</span>
+            </div>
+            <div className="h-40 overflow-y-auto space-y-2 pr-2 scrollbar-thin scrollbar-thumb-green-900 scrollbar-track-transparent">
+              {ailStream.map((item, i) => (
+                <div key={i} className="animate-in slide-in-from-bottom-2 fade-in" style={{ animationDelay: `${i * 100}ms` }}>
+                  <div className="text-green-500/50 mb-1">[{new Date().toISOString()}] SOURCE: {item.source}</div>
+                  <div className="text-green-400 leading-relaxed pl-2 border-l border-green-800">{item.preview}</div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
