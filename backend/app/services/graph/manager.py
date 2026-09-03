@@ -8,9 +8,14 @@ class GraphManager:
         self.db = db
         # Using MultiDiGraph to preserve parallel edges (e.g. multiple transactions or posts)
         self.nx_graph = nx.MultiDiGraph()
+        self._node_cache = {} # Cache to prevent UNIQUE constraint errors in same transaction
         
     def add_node(self, entity_id: str, entity_type: str, name: str, anomaly_score: float = None):
-        node = self.db.query(EntityNode).filter(EntityNode.entity_id == entity_id).first()
+        if entity_id in self._node_cache:
+            node = self._node_cache[entity_id]
+        else:
+            node = self.db.query(EntityNode).filter(EntityNode.entity_id == entity_id).first()
+            
         if not node:
             node = EntityNode(
                 entity_id=entity_id,
@@ -19,6 +24,7 @@ class GraphManager:
                 anomaly_score=anomaly_score
             )
             self.db.add(node)
+            self._node_cache[entity_id] = node
         else:
             # Upgrade risk score and type if new evidence is stronger
             if anomaly_score is not None and (node.anomaly_score is None or anomaly_score > node.anomaly_score):
