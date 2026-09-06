@@ -9,6 +9,29 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 export default function Dashboard() {
   const [health, setHealth] = useState<any>(null);
   const [ailStream, setAilStream] = useState<any[]>([]);
+  const [interceptText, setInterceptText] = useState("");
+  const [isIntercepting, setIsIntercepting] = useState(false);
+
+  const handleIntercept = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!interceptText.trim()) return;
+    setIsIntercepting(true);
+    try {
+      const res = await axios.post("http://localhost:8000/api/pipeline/ingest/intercept", { text: interceptText });
+      setPipelineStatus(`Target intercepted. Anomaly score: ${res.data.result.anomaly_score.toFixed(3)}`);
+      if (res.data.stream) setAilStream(res.data.stream);
+      setInterceptText("");
+      
+      const ent = await axios.get("http://localhost:8000/api/entities");
+      setEntities(ent.data);
+      const alt = await axios.get("http://localhost:8000/api/alerts");
+      setAlerts(alt.data);
+    } catch(err: any) {
+      setPipelineStatus(`Intercept Error: ${err.message}`);
+    } finally {
+      setIsIntercepting(false);
+    }
+  };
 
   const [entities, setEntities] = useState<any[]>([]);
   const [alerts, setAlerts] = useState<any[]>([]);
@@ -142,20 +165,22 @@ export default function Dashboard() {
 
   return (
     <div className="relative min-h-screen bg-[#030303] text-neutral-200 p-4 md:p-8 font-sans overflow-hidden z-0">
-      <div className="data-flow-bg"></div>
+      <div className="crt-overlay"></div>
+      <div className="data-flow-bg"><div className="radar-sweep"></div></div>
       
       {/* Top Header */}
       <header className="relative flex flex-col md:flex-row md:items-center justify-between pb-6 mb-8 border-b border-white/5 z-10">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-cyan-500/10 rounded-xl border border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
-            <Network className="text-cyan-400" size={28} />
+          <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.3)] relative overflow-hidden">
+            <div className="absolute inset-0 bg-red-500/10 animate-pulse mix-blend-screen"></div>
+            <ShieldAlert className="text-blue-400 relative z-10" size={28} />
           </div>
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tighter text-white flex items-center gap-2 glitch-text">
-              DARKINT <span className="text-cyan-500 font-light text-2xl">OS</span>
+            <h1 className="text-3xl font-extrabold tracking-tighter text-white flex items-center gap-2 glitch-text drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]">
+              DARKINT <span className="text-red-500 font-light text-2xl">// CP3</span>
             </h1>
-            <p className="text-xs font-mono text-cyan-500/60 mt-1 uppercase tracking-widest flex items-center gap-2">
-              <Lock size={10} /> Secure Illicit Market Intelligence Platform
+            <p className="text-[10px] font-mono text-blue-300/80 mt-1 uppercase tracking-widest flex items-center gap-2">
+              <Lock size={10} className="text-red-400" /> Chandigarh Police Hackathon 3.0 • Team Quantella
             </p>
           </div>
         </div>
@@ -220,6 +245,34 @@ export default function Dashboard() {
             {isProcessing === 'osint' ? <div className="spinner !border-l-blue-400"></div> : <ChevronRight size={16} className="text-blue-500/50" />}
           </button>
         </div>
+
+        {/* --- NEW: LIVE INTERCEPT CONSOLE --- */}
+        <div className="mt-6 terminal-input-container p-4 relative z-10">
+          <div className="flex items-center gap-2 mb-2">
+            <Zap size={14} className="text-blue-500 animate-pulse" />
+            <h3 className="text-blue-500 text-xs font-bold tracking-widest uppercase">Live Threat Intercept</h3>
+          </div>
+          <form onSubmit={handleIntercept} className="flex items-center gap-3">
+            <span className="text-blue-500 font-mono text-sm opacity-50">&gt;</span>
+            <input 
+              type="text" 
+              value={interceptText}
+              onChange={(e) => setInterceptText(e.target.value)}
+              placeholder="Paste raw darknet comms here (e.g. 'Selling zero-day exploit, drop Wickr ID...')"
+              className="terminal-input text-sm py-1"
+              disabled={isIntercepting}
+              autoComplete="off"
+            />
+            <button 
+              type="submit" 
+              disabled={isIntercepting || !interceptText.trim()}
+              className="px-4 py-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 border border-blue-500/50 rounded font-mono text-xs uppercase tracking-wider transition-all disabled:opacity-50"
+            >
+              {isIntercepting ? 'UPLOADING...' : 'INJECT'}
+            </button>
+          </form>
+        </div>
+        {/* --- END NEW --- */}
         
         {pipelineStatus && (
           <div className="mt-4 flex items-center gap-2 text-xs font-mono bg-cyan-950/30 p-3 rounded-lg text-cyan-300 border border-cyan-900/50 shadow-[inset_0_0_10px_rgba(6,182,212,0.1)] relative z-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -229,17 +282,17 @@ export default function Dashboard() {
         )}
 
         {ailStream.length > 0 && (
-          <div className="mt-6 bg-black border border-green-500/30 rounded-lg p-4 font-mono text-[10px] overflow-hidden shadow-[0_0_15px_rgba(34,197,94,0.1)] relative">
+          <div className="mt-6 bg-black border border-blue-500/30 rounded-lg p-4 font-mono text-[10px] overflow-hidden shadow-[0_0_15px_rgba(34,197,94,0.1)] relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent opacity-50"></div>
-            <div className="flex items-center gap-2 mb-3 text-green-400 border-b border-green-900/50 pb-2">
+            <div className="flex items-center gap-2 mb-3 text-blue-400 border-b border-blue-900/50 pb-2">
               <Activity size={14} className="animate-pulse" />
               <span className="tracking-widest uppercase">AIL Framework // Live Leak Stream</span>
             </div>
             <div className="h-40 overflow-y-auto space-y-2 pr-2 scrollbar-thin scrollbar-thumb-green-900 scrollbar-track-transparent">
               {ailStream.map((item, i) => (
                 <div key={i} className="animate-in slide-in-from-bottom-2 fade-in" style={{ animationDelay: `${i * 100}ms` }}>
-                  <div className="text-green-500/50 mb-1">[{new Date().toISOString()}] SOURCE: {item.source}</div>
-                  <div className="text-green-400 leading-relaxed pl-2 border-l border-green-800">{item.preview}</div>
+                  <div className="text-blue-500/50 mb-1">[{new Date().toISOString()}] SOURCE: {item.source}</div>
+                  <div className="text-blue-400 leading-relaxed pl-2 border-l border-blue-800">{item.preview}</div>
                 </div>
               ))}
             </div>
@@ -401,7 +454,7 @@ export default function Dashboard() {
                   {textExplanation.top_contributions?.map((c: any, idx: number) => (
                     <div key={idx} className="flex justify-between items-center text-xs p-2 bg-white/5 rounded">
                       <span className="text-purple-300 font-mono">{c.term}</span>
-                      <span className={c.shap_contribution > 0 ? "text-red-300" : "text-green-300"}>
+                      <span className={c.shap_contribution > 0 ? "text-red-300" : "text-blue-300"}>
                         {c.shap_contribution > 0 ? "+" : ""}{c.shap_contribution.toFixed(4)}
                       </span>
                     </div>
