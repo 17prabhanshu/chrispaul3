@@ -47,7 +47,8 @@ export default function IngestionSimulator() {
     setNlpLoading(true);
     setNlpResult(null);
     try {
-      const res = await fetch("http://localhost:8000/api/pipeline/ingest/intercept", {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8001";
+      const res = await fetch(`${backendUrl}/api/pipeline/ingest/intercept`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: inputText }),
@@ -69,8 +70,6 @@ export default function IngestionSimulator() {
       setNlpResult({ entities: [], flags: ["CONNECTION REFUSED"], riskScore: 0, decision: "ERROR" });
     }
     setNlpLoading(false);
-  };
-    }
   };
 
   return (
