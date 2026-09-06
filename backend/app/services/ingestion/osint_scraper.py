@@ -101,7 +101,16 @@ def run_osint_scrape():
                 print(f"[-] Error ingesting event from {item['platform']}: {e}")
                 
         print(f"[+] Ingestion complete. AI extracted entities for {count} events.")
-        return {"status": "success", "message": "Live OSINT Scrape Complete", "ingested": count}
+        stream_preview = [
+            {"source": item["platform"], "preview": item["text"][:150] + "..."} 
+            for item in live_data
+        ]
+        return {
+            "status": "success", 
+            "message": "Live OSINT Scrape Complete", 
+            "ingested": count,
+            "stream": stream_preview
+        }
     finally:
         db.close()
 

@@ -12,7 +12,9 @@ import {
   FileText,
   Database,
   Bank,
-  CheckSquareOffset
+  CheckSquareOffset,
+  Circle,
+  Pulse
 } from "@phosphor-icons/react";
 import clsx from "clsx";
 
@@ -22,7 +24,7 @@ const navSections = [
     items: [
       { href: "/", label: "Command Center", icon: ShieldChevron },
       { href: "/actions", label: "Action Center", icon: CheckSquareOffset, badge: "11" },
-      { href: "/alerts", label: "Alerts", icon: WarningOctagon, badge: "03", badgeColor: "bg-red-500/20 text-red-400 border border-red-500/30" },
+      { href: "/alerts", label: "Alerts", icon: WarningOctagon, badge: "03", badgeColor: "bg-red-600 text-white" },
       { href: "/investigations", label: "Investigations", icon: FolderOpen },
     ]
   },
@@ -57,19 +59,26 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
 
-  // ⌘K handled by CommandPalette globally now, keeping it here for visual only
-  
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        router.push('/search');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [router]);
+
   return (
-    <aside className="w-64 bg-[#0A0E14] border-r border-white/5 flex flex-col h-full shrink-0 z-20 relative">
-      <div className="absolute top-0 right-0 w-[1px] h-full bg-gradient-to-b from-transparent via-blue-500/20 to-transparent"></div>
-      
-      <div className="flex-1 overflow-y-auto py-6 custom-scrollbar">
+    <aside className="w-60 bg-white nexus-border-r flex flex-col h-full shrink-0 shadow-sm z-20">
+      <div className="flex-1 overflow-y-auto py-5">
         {navSections.map((section, idx) => (
-          <div key={idx} className="mb-6">
-            <h3 className="px-6 text-[10px] font-mono text-blue-500/50 uppercase tracking-widest mb-2 font-semibold">
+          <div key={idx} className="mb-5">
+            <h3 className="px-5 text-[9px] font-mono text-zinc-500 uppercase tracking-widest mb-1.5 font-bold">
               {section.title}
             </h3>
-            <ul className="space-y-1">
+            <ul className="space-y-0.5">
               {section.items.map((item: any) => {
                 const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
                 return (
@@ -77,31 +86,29 @@ export function Sidebar() {
                     <Link
                       href={item.href}
                       className={clsx(
-                        "flex items-center justify-between px-6 py-2.5 text-xs transition-all duration-200 border-l-[3px]",
+                        "flex items-center justify-between px-5 py-2 text-xs transition-none border-l-2",
                         isActive
-                          ? "border-blue-500 bg-blue-500/10 text-white font-medium shadow-[inset_4px_0_10px_rgba(37,99,235,0.1)]"
-                          : "border-transparent text-zinc-400 hover:text-white hover:bg-white/5"
+                          ? "border-gov-blue bg-blue-50/70 text-gov-blue font-bold"
+                          : "border-transparent text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100"
                       )}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2.5">
                         <item.icon
-                          weight={isActive ? "fill" : "regular"}
-                          className={clsx("text-lg", isActive ? "text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]" : "text-zinc-500")}
+                          weight={isActive ? "fill" : "bold"}
+                          className={clsx("text-base", isActive ? "text-gov-blue" : "text-zinc-500")}
                         />
-                        <span className="tracking-wide">{item.label}</span>
+                        <span>{item.label}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        {item.badge && (
-                          <span className={clsx("text-[9px] font-mono px-1.5 py-0.5 rounded-sm", item.badgeColor || "bg-white/10 text-zinc-300 border border-white/10")}>
-                            {item.badge}
-                          </span>
-                        )}
-                        {item.shortcut && (
-                          <kbd className="text-[9px] font-mono bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-zinc-500">
-                            {item.shortcut}
-                          </kbd>
-                        )}
-                      </div>
+                      {item.badge && (
+                        <span className={clsx("text-[10px] font-mono px-1.5 py-0.2 font-bold", item.badgeColor || "bg-zinc-200 text-zinc-800")}>
+                          {item.badge}
+                        </span>
+                      )}
+                      {item.shortcut && (
+                        <kbd className="text-[9px] font-mono bg-zinc-100 border border-zinc-300 px-1 py-0.5 text-zinc-500">
+                          {item.shortcut}
+                        </kbd>
+                      )}
                     </Link>
                   </li>
                 );
@@ -112,25 +119,24 @@ export function Sidebar() {
       </div>
       
       {/* System Telemetry Footer */}
-      <div className="p-4 border-t border-white/5 bg-[#050507] text-[10px] font-mono text-zinc-500 space-y-2 relative">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+      <div className="p-3 border-t border-zinc-200 bg-zinc-50 text-[10px] font-mono text-zinc-600 space-y-1.5">
         <div className="flex justify-between items-center">
-          <span className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.5)]"></span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
             Tor Crawlers
           </span>
-          <span className="font-bold text-zinc-300">8 Active</span>
+          <span className="font-bold text-zinc-800">8 Active</span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full shadow-[0_0_5px_rgba(59,130,246,0.5)]"></span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
             FIU-IND Node
           </span>
-          <span className="font-bold text-blue-400">Synced</span>
+          <span className="font-bold text-emerald-700">Online</span>
         </div>
-        <div className="flex justify-between items-center pt-2 mt-2 border-t border-white/5 text-[9px] text-zinc-600">
-          <span>DARKINT v3.1</span>
-          <span className="text-red-500/50">RESTRICTED</span>
+        <div className="flex justify-between items-center pt-1 border-t border-zinc-200 text-[9px] text-zinc-400">
+          <span>pineSAW v2.0 (Phase 2)</span>
+          <span>RESTRICTED</span>
         </div>
       </div>
     </aside>
