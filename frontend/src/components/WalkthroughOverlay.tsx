@@ -26,7 +26,7 @@ export function WalkthroughOverlay() {
     return (
       <button 
         onClick={() => setActive(true)}
-        className="fixed bottom-6 left-6 z-[90] px-4 py-2 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 rounded-full font-mono text-[10px] uppercase tracking-widest backdrop-blur-md flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(59,130,246,0.2)]"
+        className="fixed bottom-6 right-6 z-[90] px-4 py-2 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 rounded-full font-mono text-[10px] uppercase tracking-widest backdrop-blur-md flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(59,130,246,0.2)]"
       >
         <PlayCircle size={16} /> Demo Mode
       </button>

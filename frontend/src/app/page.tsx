@@ -217,6 +217,13 @@ export default function CommandCenter() {
                   </thead>
                   <tbody className="divide-y divide-white/5">
                     <AnimatePresence>
+                      {data.topEntities?.length === 0 && (
+                        <motion.tr initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-transparent cursor-default">
+                          <td colSpan={4} className="px-5 py-8 text-center text-zinc-500 font-mono text-[10px] tracking-widest">
+                            NO PRIORITY TARGETS QUEUED
+                          </td>
+                        </motion.tr>
+                      )}
                       {data.topEntities?.slice(0,8).map((ent: any, i: number) => (
                         <motion.tr 
                           initial={{ opacity: 0, y: 10 }}
