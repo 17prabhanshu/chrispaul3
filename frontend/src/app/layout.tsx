@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
+import { CommandPalette } from "@/components/CommandPalette";
+import { WalkthroughOverlay } from "@/components/WalkthroughOverlay";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const plexMono = IBM_Plex_Mono({ weight: ["400", "500", "600"], subsets: ["latin"], variable: "--font-mono" });
@@ -60,6 +62,10 @@ export default function RootLayout({
           <Sidebar />
           <main className="flex-1 overflow-hidden bg-zinc-100 relative">
             {children}
+            <CommandPalette />
+            <WalkthroughOverlay />
+            <CommandPalette />
+            <WalkthroughOverlay />
           </main>
         </div>
       </body>
